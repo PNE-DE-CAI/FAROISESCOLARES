@@ -112,15 +112,40 @@
             padding: 2px 4px;
             text-align: center;
         }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #10B981;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <span id="toast-message">Alterações salvas com sucesso!</span>
+    </div>
+
     <!-- Header -->
-    <header class="bg-gradient-to-r from-indigo-600 to-PINK-600 text-white shadow-lg">
+    <header class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg">
         <div class="container mx-auto px-4 py-6">
             <div class="flex flex-col md:flex-row justify-between items-center">
                 <div class="mb-4 md:mb-0">
-                    <h1 class="text-3xl font-bold">Escola <span id="school-name" class="gradient-text editable">ESTADUAL DOMINGOS CAMBIAGHI</span></h1>
+                    <h1 class="text-3xl font-bold">E.E. DOMINGOS CAMBIAGHI <span id="school-name" class="gradient-text editable">Excelência Educacional</span></h1>
                     <p class="text-indigo-100">Painel de Desempenho Escolar</p>
                 </div>
                 <div class="flex items-center bg-white/20 rounded-full px-6 py-2">
@@ -243,13 +268,13 @@
             <div class="card p-6">
                 <div class="flex items-center mb-4">
                     <div class="traffic-light" id="nota-light"></div>
-                    <h3 class="text-xl font-semibold text-gray-800">Nota Final</h3>
+                    <h3 class="text-xl font-semibold text-gray-800">Aluno Presente</h3>
                 </div>
                 <div class="flex items-center">
                     <input type="number" min="0" max="100" id="nota-input" class="input-field w-24 px-4 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     <span class="px-4 py-2 bg-gray-100 text-gray-700 rounded-r-lg">%</span>
                 </div>
-                <p class="mt-2 text-sm text-gray-500">Média geral de desempenho</p>
+                <p class="mt-2 text-sm text-gray-500">Percentual de alunos presentes</p>
             </div>
         </div>
         
@@ -269,7 +294,7 @@
                             <input type="text" value="9º Ano A" class="class-input" id="class-1-name">
                         </h3>
                         <p class="text-sm text-indigo-600">
-                            Alunos presentes: <input type="number" value="84" min="0" max="100" class="class-input" id="class-1-value">%
+                            Alunos presentes: <input type="number" value="87" min="0" max="100" class="class-input" id="class-1-value">%
                         </p>
                     </div>
                     
@@ -282,7 +307,7 @@
                             <input type="text" value="8º Ano B" class="class-input" id="class-2-name">
                         </h3>
                         <p class="text-sm text-purple-600">
-                            Alunos presentes: <input type="number" value="84" min="0" max="100" class="class-input" id="class-2-value">%
+                            Alunos presentes: <input type="number" value="85" min="0" max="100" class="class-input" id="class-2-value">%
                         </p>
                     </div>
                     
@@ -295,7 +320,7 @@
                             <input type="text" value="7º Ano A" class="class-input" id="class-3-name">
                         </h3>
                         <p class="text-sm text-blue-600">
-                            Alunos presentes: <input type="number" value="84" min="0" max="100" class="class-input" id="class-3-value">%
+                            Alunos presentes: <input type="number" value="82" min="0" max="100" class="class-input" id="class-3-value">%
                         </p>
                     </div>
                     
@@ -308,7 +333,7 @@
                             <input type="text" value="6º Ano C" class="class-input" id="class-4-name">
                         </h3>
                         <p class="text-sm text-green-600">
-                            Alunos presentes: <input type="number" value="84" min="0" max="100" class="class-input" id="class-4-value">%
+                            Alunos presentes: <input type="number" value="80" min="0" max="100" class="class-input" id="class-4-value">%
                         </p>
                     </div>
                     
@@ -321,7 +346,7 @@
                             <input type="text" value="9º Ano C" class="class-input" id="class-5-name">
                         </h3>
                         <p class="text-sm text-yellow-600">
-                            Alunos presentes: <input type="number" value="84" min="0" max="100" class="class-input" id="class-5-value">%
+                            Alunos presentes: <input type="number" value="78" min="0" max="100" class="class-input" id="class-5-value">%
                         </p>
                     </div>
                 </div>
@@ -355,13 +380,38 @@
                 </div>
             </div>
             <div class="mt-8 text-center text-indigo-200 text-sm">
-                <p>Desenvolvido com <i class="fas fa-heart text-red-300"></i> pela Equipe de Tecnologia Educacional DE CAIEIRAS NPC-2025</p>
+                <p>Desenvolvido com <i class="fas fa-heart text-red-300"></i> pela Equipe de Tecnologia Educacional NPC - DE CAIEIRAS 2025</p>
                 <p class="mt-1">© 2025 Escola <span id="footer-school-name">Excelência Educacional</span>. Todos os direitos reservados.</p>
             </div>
         </div>
     </footer>
 
     <script>
+        // Toast notification function
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Save data to localStorage
+        function saveData(key, value) {
+            localStorage.setItem(key, JSON.stringify(value));
+            showToast('Alterações salvas com sucesso!');
+        }
+
+        // Load data from localStorage
+        function loadData(key, defaultValue) {
+            const data = localStorage.getItem(key);
+            return data ? JSON.parse(data) : defaultValue;
+        }
+
         // Set current week
         function getCurrentWeek() {
             const now = new Date();
@@ -373,8 +423,12 @@
             return week;
         }
         
-        document.getElementById('week-number').textContent = getCurrentWeek();
-        document.getElementById('year').textContent = new Date().getFullYear();
+        // Load saved week and year or use current
+        const savedWeek = loadData('school-week', getCurrentWeek());
+        const savedYear = loadData('school-year', new Date().getFullYear());
+        
+        document.getElementById('week-number').textContent = savedWeek;
+        document.getElementById('year').textContent = savedYear;
         
         // Traffic light logic
         function updateTrafficLight(inputId, lightId) {
@@ -395,6 +449,9 @@
                 } else {
                     light.classList.add('red');
                 }
+                
+                // Save the value
+                saveData(inputId, value);
             });
         }
         
@@ -413,28 +470,19 @@
         
         indicators.forEach(indicator => {
             updateTrafficLight(indicator.input, indicator.light);
+            
+            // Load saved values
+            const savedValue = loadData(indicator.input, Math.floor(Math.random() * 30 + 60));
+            document.getElementById(indicator.input).value = savedValue;
+            
+            // Trigger input event to update light
+            document.getElementById(indicator.input).dispatchEvent(new Event('input'));
         });
         
-        // Set random initial values for demo
-        function setRandomValues() {
-            document.getElementById('tarefasp-input').value = Math.floor(Math.random() * 30 + 60);
-            document.getElementById('elefante-input').value = Math.floor(Math.random() * 30 + 60);
-            document.getElementById('redacao-input').value = Math.floor(Math.random() * 30 + 60);
-            document.getElementById('leia-input').value = Math.floor(Math.random() * 30 + 60);
-            document.getElementById('speak-input').value = Math.floor(Math.random() * 30 + 60);
-            document.getElementById('alura-input').value = Math.floor(Math.random() * 30 + 60);
-            document.getElementById('matific-input').value = Math.floor(Math.random() * 30 + 60);
-            document.getElementById('khan-input').value = Math.floor(Math.random() * 30 + 60);
-            document.getElementById('nota-input').value = Math.floor(Math.random() * 30 + 60);
-            
-            // Trigger input events to update lights
-            indicators.forEach(indicator => {
-                document.getElementById(indicator.input).dispatchEvent(new Event('input'));
-            });
-        }
-        
-        // Initialize with random values
-        setRandomValues();
+        // Load saved school name or use default
+        const savedSchoolName = loadData('school-name', 'Excelência Educacional');
+        document.getElementById('school-name').textContent = savedSchoolName;
+        document.getElementById('footer-school-name').textContent = savedSchoolName;
         
         // Editable school name
         const schoolNameElement = document.getElementById('school-name');
@@ -456,6 +504,7 @@
                 const newName = this.value.trim() || 'Excelência Educacional';
                 schoolNameElement.textContent = newName;
                 footerSchoolNameElement.textContent = newName;
+                saveData('school-name', newName);
             });
             
             input.addEventListener('keypress', function(e) {
@@ -507,6 +556,9 @@
                 
                 weekNumberElement.textContent = newWeek;
                 yearElement.textContent = newYear;
+                
+                saveData('school-week', newWeek);
+                saveData('school-year', newYear);
             }
             
             weekInput.addEventListener('blur', saveChanges);
@@ -530,10 +582,18 @@
             const classNameInput = document.getElementById(`class-${i}-name`);
             const classValueInput = document.getElementById(`class-${i}-value`);
             
+            // Load saved class data
+            const savedClassName = loadData(`class-${i}-name`, classNameInput.value);
+            const savedClassValue = loadData(`class-${i}-value`, classValueInput.value);
+            
+            classNameInput.value = savedClassName;
+            classValueInput.value = savedClassValue;
+            
             classNameInput.addEventListener('change', function() {
                 if (!this.value.trim()) {
                     this.value = `Turma ${i}`;
                 }
+                saveData(`class-${i}-name`, this.value);
             });
             
             classValueInput.addEventListener('change', function() {
@@ -542,6 +602,7 @@
                 if (value < 0) value = 0;
                 if (value > 100) value = 100;
                 this.value = value;
+                saveData(`class-${i}-value`, value);
             });
         }
     </script>
